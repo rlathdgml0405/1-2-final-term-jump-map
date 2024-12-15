@@ -6,6 +6,9 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
+    public int Ammo;
+    public int maxAmmo;
+
     public float speed;
     public float rotSpeed;
     float hAxis;
@@ -19,14 +22,16 @@ public class Player : MonoBehaviour
     Vector3 moveVec;
     Rigidbody rigid;
     Animator anim;
-    private Vector3 startPosition; 
+    private Vector3 startPosition;
+
+
 
     void Awake()
     {
         anim = GetComponentInChildren<Animator>();
         rigid = GetComponent<Rigidbody>();
         startPosition = transform.position;
-       
+
     }
 
     // Update is called once per frame
@@ -56,7 +61,7 @@ public class Player : MonoBehaviour
         vAxis = Input.GetAxisRaw("Vertical");
         wDown = Input.GetButton("Walk");
         jDown = Input.GetButton("Jump");
-        MouseX = Input.GetAxis("Mouse X");   
+        MouseX = Input.GetAxis("Mouse X");
     }
 
     void Move()
@@ -68,8 +73,8 @@ public class Player : MonoBehaviour
         Vector3 hori = transform.right * hAxis;
         Vector3 vert = transform.forward * vAxis;
 
-        moveVec=(hori+vert).normalized*speed;
-        rigid.MovePosition(transform.position+moveVec*Time.deltaTime);
+        moveVec = (hori + vert).normalized * speed;
+        rigid.MovePosition(transform.position + moveVec * Time.deltaTime);
 
 
 
@@ -81,12 +86,12 @@ public class Player : MonoBehaviour
     {
         //transform.LookAt(transform.position + moveVec);
         //transform.Rotate(Vector3.up * hAxis * speed * Time.deltaTime);
-       if (Input.GetMouseButton(0))
+        if (Input.GetMouseButton(0))
         {
             transform.Rotate(Vector3.up * rotSpeed * MouseX);
         }
-          
-        
+
+
     }
 
     void Jump()
@@ -95,21 +100,56 @@ public class Player : MonoBehaviour
         {
             rigid.AddForce(Vector3.up * 2000, ForceMode.Impulse);
             anim.SetBool("isJimp", true);
-            anim.SetTrigger("doJump"); 
+            anim.SetTrigger("doJump");
             isJump = true;
         }
     }
     void OnCollisionEnter(Collision collision)
     {
-        if(collision.gameObject.tag == "Floor")
+        if (collision.gameObject.tag == "Floor")
         {
             anim.SetBool("isJump", false);
             isJump = false;
         }
 
-        if(collision.gameObject.tag == "Water")
+        if (collision.gameObject.tag == "Water")
         {
             transform.position = startPosition;
         }
     }
+
+    void OnTriggerEnter(Collider other)
+    {
+        if (other.tag == "Item")
+        {
+            Item item = other.GetComponent<Item>();
+            switch (item.type)
+            {
+                case Item.Type.Ammo:
+                    Ammo += item.value;
+                        if(Ammo > maxAmmo)
+                        Ammo = maxAmmo; 
+                    break;
+            }
+            Destroy(other.gameObject);
+        }
+        if (other.gameObject.name.Equals("SwitchObject"))
+        {
+            Door d = FindObjectOfType<Door>();
+
+            if (d.door_state == 0)
+            {
+                d.door_state = 1;
+            }
+            else if (d.door_state == 1)
+            {
+                d.door_state = 2;
+            }
+            else if (d.door_state == 2)
+            {
+                d.door_state = 1;
+            }
+        }
+    }
 }
+
