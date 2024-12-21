@@ -18,6 +18,7 @@ public class Player : MonoBehaviour
     bool jDown;
 
     bool isJump;
+    bool isClear;
 
     Vector3 moveVec;
     Rigidbody rigid;
@@ -37,12 +38,25 @@ public class Player : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        GetInput();
-        Move();
-        Turn();
-        Jump();
+        if (GameObject.Find("Script").GetComponent<GamePlay>().heart_num > 0 && !isClear)
+            {
 
 
+            GetInput();
+            Move();
+            Turn();
+            Jump();
+        }
+       
+
+
+
+    }
+
+    public void PlayerReset()
+    {
+        PositionReset();
+        isClear = false;    
     }
 
     void FreezeRotation()
@@ -104,6 +118,14 @@ public class Player : MonoBehaviour
             isJump = true;
         }
     }
+
+    public void PositionReset()
+    {
+        transform.position = startPosition;
+    }
+    
+    
+
     void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.tag == "Floor")
@@ -114,7 +136,28 @@ public class Player : MonoBehaviour
 
         if (collision.gameObject.tag == "Water")
         {
-            transform.position = startPosition;
+            PositionReset();
+
+
+            GameObject.Find("Script").GetComponent<GamePlay>().heart_num--;
+
+            if (GameObject.Find("Script").GetComponent<GamePlay>().heart_num == 2)
+            {
+                GameObject.Find("heart3").gameObject.SetActive(false);
+            }
+
+            else if (GameObject.Find("Script").GetComponent<GamePlay>().heart_num == 1)
+            {
+                GameObject.Find("heart2").gameObject.SetActive(false);
+            }
+
+            else if (GameObject.Find("Script").GetComponent<GamePlay>().heart_num == 0)
+            {
+                GameObject.Find("heart1").gameObject.SetActive(false);
+                GameObject.Find("Canvas").transform.Find("gameover").gameObject.SetActive(true);
+            }
+
+            
         }
     }
 
@@ -150,6 +193,16 @@ public class Player : MonoBehaviour
                 d.door_state = 1;
             }
         }
+
+
+       // Debug.Log(collision.gameObject.name);
+        if (other.tag == "Goal")
+        {
+            GameObject.Find("Canvas").transform.Find("GameClear").gameObject.SetActive(true);
+            isClear = true;
+        }
     }
+    
+
 }
 

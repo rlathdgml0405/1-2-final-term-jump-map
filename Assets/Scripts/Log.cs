@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class Log : MonoBehaviour
 {
-    public float delta = 0.1f; 
+    public float delta = 0.1f;
 
     void Start()
     {
@@ -26,5 +26,6 @@ public class Log : MonoBehaviour
         {
             delta *= -1;
         }
+
     }
 }

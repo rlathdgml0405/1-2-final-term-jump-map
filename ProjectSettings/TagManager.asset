@@ -10,6 +10,8 @@ TagManager:
   - Weapon
   - Item
   - Enemy
+  - House
+  - Goal
   layers:
   - Default
   - TransparentFX
